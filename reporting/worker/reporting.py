@@ -91,6 +91,7 @@ class ReportingWorker:
         explicit_chunks.extend(self.hybrid_search.search(
             query=base_query,
             ticker=movement.ticker,
+            stock_name=movement.stock_name,
             start_date=start_date,
             end_date=end_date,
             k=10
@@ -102,6 +103,7 @@ class ReportingWorker:
             explicit_chunks.extend(self.hybrid_search.search(
                 query=magnitude_query,
                 ticker=movement.ticker,
+                stock_name=movement.stock_name,
                 start_date=start_date,
                 end_date=end_date,
                 k=10
@@ -112,6 +114,7 @@ class ReportingWorker:
             explicit_chunks.extend(self.hybrid_search.search(
                 query=keyword_query,
                 ticker=movement.ticker,
+                stock_name=movement.stock_name,
                 start_date=start_date,
                 end_date=end_date,
                 k=5
@@ -132,6 +135,7 @@ class ReportingWorker:
             event_chunks.extend(self.hybrid_search.search(
                 query=query,
                 ticker=movement.ticker,
+                stock_name=movement.stock_name,
                 start_date=start_date,
                 end_date=end_date,
                 k=8

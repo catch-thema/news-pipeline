@@ -73,6 +73,7 @@ class RAGService:
         self,
         query: str,
         stock_name: Optional[str] = None,
+        ticker: Optional[str] = None,
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         n_results: int = 5,
@@ -98,7 +99,11 @@ class RAGService:
             conditions = ["embedding IS NOT NULL"]
             params = []
 
-            if stock_name:
+            if ticker:
+                conditions.append("metadata->>'ticker' = %s")
+                params.append(ticker)
+
+            elif stock_name:
                 conditions.append("metadata->>'stock_name' = %s")
                 params.append(stock_name)
 

@@ -28,6 +28,7 @@ class HybridSearchService:
             self,
             query: str,
             ticker: Optional[str] = None,
+            stock_name: Optional[str] = None,
             start_date: Optional[datetime] = None,
             end_date: Optional[datetime] = None,
             tags: Optional[Dict[str, Any]] = None,
@@ -50,7 +51,8 @@ class HybridSearchService:
         # 1. Dense 검색 (ChromaDB)
         dense_results = self.rag_service.search(
             query=query,
-            stock_name=ticker,
+            stock_name=stock_name,
+            ticker=ticker,
             start_date=start_date,
             end_date=end_date,
             n_results=k * 2,  # 더 많이 가져와서 재랭킹
