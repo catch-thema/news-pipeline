@@ -1,0 +1,1293 @@
+{
+  "groups": {
+    "삼성그룹": [
+      "삼성전자",
+      "삼성SDI",
+      "삼성물산",
+      "삼성바이오로직스",
+      "삼성중공업"
+    ],
+    "SK그룹": [
+      "SK하이닉스",
+      "SK이노베이션",
+      "SK바이오사이언스",
+      "SK케미칼"
+    ],
+    "현대차그룹": [
+      "현대차",
+      "기아",
+      "현대글로비스",
+      "현대오토에버"
+    ],
+    "HD현대그룹": [
+      "HD현대",
+      "HD현대중공업",
+      "HD한국조선해양",
+      "HD현대미포",
+      "HD현대일렉트릭",
+      "HD현대에너지솔루션"
+    ],
+    "LG그룹": [
+      "LG화학",
+      "LG에너지솔루션",
+      "LG이노텍"
+    ],
+    "HLB그룹": [
+      "HLB",
+      "HLB생명과학",
+      "HLB제약",
+      "HLB바이오스텝",
+      "HLB테라퓨틱스",
+      "HLB파나진",
+      "HLB이노베이션"
+    ],
+    "한화그룹": [
+      "한화오션"
+    ],
+    "효성그룹": [
+      "효성중공업",
+      "HS효성첨단소재"
+    ],
+    "엔터테인먼트": [
+      "JYP Ent.",
+      "에스엠",
+      "하이브",
+      "와이지엔터테인먼트",
+      "SAMG엔터"
+    ],
+    "조선산업": [
+      "HD현대중공업",
+      "HD한국조선해양",
+      "삼성중공업",
+      "HD현대미포",
+      "한화오션",
+      "HJ중공업",
+      "동일스틸럭스"
+    ],
+    "로봇산업": [
+      "두산로보틱스",
+      "레인보우로보틱스",
+      "유일로보틱스",
+      "하이젠알앤엠",
+      "로보티즈",
+      "로보스타",
+      "클로봇",
+      "로보로보",
+      "휴림로봇",
+      "엔젤로보틱스"
+    ],
+    "증권업": [
+      "키움증권",
+      "미래에셋증권",
+      "한국금융지주",
+      "한양증권"
+    ],
+    "반도체산업": [
+      "삼성전자",
+      "SK하이닉스",
+      "알파칩스",
+      "메가터치",
+      "한성크린텍"
+    ],
+    "배터리산업": [
+      "삼성SDI",
+      "LG에너지솔루션",
+      "SK이노베이션",
+      "엘앤에프",
+      "HS효성첨단소재",
+      "케이이엠텍"
+    ],
+    "원전에너지": [
+      "두산에너빌리티",
+      "현대건설",
+      "강원에너지"
+    ],
+    "남북경협": [
+      "코데즈컴바인",
+      "양지사",
+      "좋은사람들",
+      "제이에스티나",
+      "아난티",
+      "인디에프",
+      "신원",
+      "형지엘리트"
+    ],
+    "AI산업": [
+      "카카오",
+      "마음AI",
+      "비아이매트릭스",
+      "신테카바이오",
+      "플리토"
+    ]
+  },
+  "stock_relationships": {
+    "S-Oil": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 2
+    },
+    "LG화학": {
+      "related_companies": [
+        "LG에너지솔루션",
+        "LG이노텍"
+      ],
+      "groups": [
+        "LG그룹"
+      ],
+      "event_count": 1
+    },
+    "LG에너지솔루션": {
+      "related_companies": [
+        "LG이노텍",
+        "LG화학",
+        "삼성SDI",
+        "엘앤에프",
+        "HS효성첨단소재",
+        "케이이엠텍",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "LG그룹",
+        "배터리산업"
+      ],
+      "event_count": 1
+    },
+    "동일기연": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "현대글로비스": {
+      "related_companies": [
+        "기아",
+        "현대오토에버",
+        "현대차"
+      ],
+      "groups": [
+        "현대차그룹"
+      ],
+      "event_count": 1
+    },
+    "지투지바이오": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "SK케미칼": {
+      "related_companies": [
+        "SK바이오사이언스",
+        "SK하이닉스",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "SK그룹"
+      ],
+      "event_count": 1
+    },
+    "SK케미칼우": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "지니너스": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "한라IMS": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "보로노이": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "HD현대일렉트릭": {
+      "related_companies": [
+        "HD현대",
+        "HD현대중공업",
+        "HD현대미포",
+        "HD현대에너지솔루션",
+        "HD한국조선해양"
+      ],
+      "groups": [
+        "HD현대그룹"
+      ],
+      "event_count": 1
+    },
+    "동원산업": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "SK이노베이션": {
+      "related_companies": [
+        "SK바이오사이언스",
+        "삼성SDI",
+        "엘앤에프",
+        "LG에너지솔루션",
+        "SK하이닉스",
+        "SK케미칼",
+        "HS효성첨단소재",
+        "케이이엠텍"
+      ],
+      "groups": [
+        "SK그룹",
+        "배터리산업"
+      ],
+      "event_count": 1
+    },
+    "SK하이닉스": {
+      "related_companies": [
+        "알파칩스",
+        "SK바이오사이언스",
+        "삼성전자",
+        "SK케미칼",
+        "메가터치",
+        "한성크린텍",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "SK그룹",
+        "반도체산업"
+      ],
+      "event_count": 3
+    },
+    "삼성전자": {
+      "related_companies": [
+        "알파칩스",
+        "삼성SDI",
+        "삼성바이오로직스",
+        "삼성물산",
+        "SK하이닉스",
+        "메가터치",
+        "한성크린텍",
+        "삼성중공업"
+      ],
+      "groups": [
+        "삼성그룹",
+        "반도체산업"
+      ],
+      "event_count": 3
+    },
+    "SAMG엔터": {
+      "related_companies": [
+        "에스엠",
+        "와이지엔터테인먼트",
+        "하이브",
+        "JYP Ent."
+      ],
+      "groups": [
+        "엔터테인먼트"
+      ],
+      "event_count": 1
+    },
+    "메가터치": {
+      "related_companies": [
+        "알파칩스",
+        "삼성전자",
+        "SK하이닉스",
+        "한성크린텍"
+      ],
+      "groups": [
+        "반도체산업"
+      ],
+      "event_count": 1
+    },
+    "HD현대": {
+      "related_companies": [
+        "HD현대중공업",
+        "HD현대일렉트릭",
+        "HD현대미포",
+        "HD현대에너지솔루션",
+        "HD한국조선해양"
+      ],
+      "groups": [
+        "HD현대그룹"
+      ],
+      "event_count": 1
+    },
+    "현대건설": {
+      "related_companies": [
+        "두산에너빌리티",
+        "강원에너지"
+      ],
+      "groups": [
+        "원전에너지"
+      ],
+      "event_count": 1
+    },
+    "HD현대중공업": {
+      "related_companies": [
+        "HD현대",
+        "HD현대일렉트릭",
+        "HJ중공업",
+        "한화오션",
+        "HD현대미포",
+        "HD현대에너지솔루션",
+        "HD한국조선해양",
+        "동일스틸럭스",
+        "삼성중공업"
+      ],
+      "groups": [
+        "HD현대그룹",
+        "조선산업"
+      ],
+      "event_count": 1
+    },
+    "HD한국조선해양": {
+      "related_companies": [
+        "HD현대",
+        "HD현대중공업",
+        "HD현대일렉트릭",
+        "HJ중공업",
+        "한화오션",
+        "HD현대미포",
+        "HD현대에너지솔루션",
+        "동일스틸럭스",
+        "삼성중공업"
+      ],
+      "groups": [
+        "HD현대그룹",
+        "조선산업"
+      ],
+      "event_count": 1
+    },
+    "삼성중공업": {
+      "related_companies": [
+        "HD현대중공업",
+        "삼성전자",
+        "HJ중공업",
+        "삼성SDI",
+        "한화오션",
+        "삼성바이오로직스",
+        "삼성물산",
+        "HD현대미포",
+        "동일스틸럭스",
+        "HD한국조선해양"
+      ],
+      "groups": [
+        "삼성그룹",
+        "조선산업"
+      ],
+      "event_count": 1
+    },
+    "HD현대미포": {
+      "related_companies": [
+        "HD현대",
+        "HD현대중공업",
+        "HD현대일렉트릭",
+        "HJ중공업",
+        "한화오션",
+        "HD현대에너지솔루션",
+        "HD한국조선해양",
+        "동일스틸럭스",
+        "삼성중공업"
+      ],
+      "groups": [
+        "HD현대그룹",
+        "조선산업"
+      ],
+      "event_count": 1
+    },
+    "한화오션": {
+      "related_companies": [
+        "HD현대중공업",
+        "HJ중공업",
+        "HD현대미포",
+        "동일스틸럭스",
+        "HD한국조선해양",
+        "삼성중공업"
+      ],
+      "groups": [
+        "한화그룹",
+        "조선산업"
+      ],
+      "event_count": 3
+    },
+    "HJ중공업": {
+      "related_companies": [
+        "HD현대중공업",
+        "한화오션",
+        "HD현대미포",
+        "동일스틸럭스",
+        "HD한국조선해양",
+        "삼성중공업"
+      ],
+      "groups": [
+        "조선산업"
+      ],
+      "event_count": 1
+    },
+    "동일스틸럭스": {
+      "related_companies": [
+        "HD현대중공업",
+        "HJ중공업",
+        "한화오션",
+        "HD현대미포",
+        "HD한국조선해양",
+        "삼성중공업"
+      ],
+      "groups": [
+        "조선산업"
+      ],
+      "event_count": 1
+    },
+    "후성": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "그래피": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "삼익제약": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "대한전선": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "파로스아이바이오": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "GS리테일": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "플리토": {
+      "related_companies": [
+        "마음AI",
+        "비아이매트릭스",
+        "카카오",
+        "신테카바이오"
+      ],
+      "groups": [
+        "AI산업"
+      ],
+      "event_count": 1
+    },
+    "아이씨티케이": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 2
+    },
+    "두산에너빌리티": {
+      "related_companies": [
+        "강원에너지",
+        "현대건설"
+      ],
+      "groups": [
+        "원전에너지"
+      ],
+      "event_count": 1
+    },
+    "마음AI": {
+      "related_companies": [
+        "비아이매트릭스",
+        "카카오",
+        "플리토",
+        "신테카바이오"
+      ],
+      "groups": [
+        "AI산업"
+      ],
+      "event_count": 1
+    },
+    "삼성물산": {
+      "related_companies": [
+        "삼성전자",
+        "삼성SDI",
+        "삼성바이오로직스",
+        "삼성중공업"
+      ],
+      "groups": [
+        "삼성그룹"
+      ],
+      "event_count": 1
+    },
+    "삼성바이오로직스": {
+      "related_companies": [
+        "삼성전자",
+        "삼성SDI",
+        "삼성물산",
+        "삼성중공업"
+      ],
+      "groups": [
+        "삼성그룹"
+      ],
+      "event_count": 1
+    },
+    "카카오": {
+      "related_companies": [
+        "마음AI",
+        "비아이매트릭스",
+        "플리토",
+        "신테카바이오"
+      ],
+      "groups": [
+        "AI산업"
+      ],
+      "event_count": 1
+    },
+    "덴티움": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "가비아": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "솔루엠": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "강원에너지": {
+      "related_companies": [
+        "두산에너빌리티",
+        "현대건설"
+      ],
+      "groups": [
+        "원전에너지"
+      ],
+      "event_count": 1
+    },
+    "삼성SDI": {
+      "related_companies": [
+        "삼성전자",
+        "엘앤에프",
+        "삼성바이오로직스",
+        "삼성물산",
+        "LG에너지솔루션",
+        "HS효성첨단소재",
+        "케이이엠텍",
+        "삼성중공업",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "삼성그룹",
+        "배터리산업"
+      ],
+      "event_count": 2
+    },
+    "파미셀": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "현대차": {
+      "related_companies": [
+        "기아",
+        "현대글로비스",
+        "현대오토에버"
+      ],
+      "groups": [
+        "현대차그룹"
+      ],
+      "event_count": 1
+    },
+    "기아": {
+      "related_companies": [
+        "현대글로비스",
+        "현대오토에버",
+        "현대차"
+      ],
+      "groups": [
+        "현대차그룹"
+      ],
+      "event_count": 1
+    },
+    "키움증권": {
+      "related_companies": [
+        "미래에셋증권",
+        "한양증권",
+        "한국금융지주"
+      ],
+      "groups": [
+        "증권업"
+      ],
+      "event_count": 1
+    },
+    "미래에셋증권": {
+      "related_companies": [
+        "키움증권",
+        "한양증권",
+        "한국금융지주"
+      ],
+      "groups": [
+        "증권업"
+      ],
+      "event_count": 1
+    },
+    "한국금융지주": {
+      "related_companies": [
+        "미래에셋증권",
+        "키움증권",
+        "한양증권"
+      ],
+      "groups": [
+        "증권업"
+      ],
+      "event_count": 1
+    },
+    "한양증권": {
+      "related_companies": [
+        "미래에셋증권",
+        "키움증권",
+        "한국금융지주"
+      ],
+      "groups": [
+        "증권업"
+      ],
+      "event_count": 1
+    },
+    "엘앤에프": {
+      "related_companies": [
+        "삼성SDI",
+        "LG에너지솔루션",
+        "HS효성첨단소재",
+        "케이이엠텍",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "배터리산업"
+      ],
+      "event_count": 1
+    },
+    "그린생명과학": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "LG이노텍": {
+      "related_companies": [
+        "LG화학",
+        "LG에너지솔루션"
+      ],
+      "groups": [
+        "LG그룹"
+      ],
+      "event_count": 1
+    },
+    "교촌에프앤비": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "두산로보틱스": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "레인보우로보틱스": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "유일로보틱스": {
+      "related_companies": [
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 2
+    },
+    "하이젠알앤엠": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "스틱인베스트먼트": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "아우토크립트": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "효성중공업": {
+      "related_companies": [
+        "HS효성첨단소재"
+      ],
+      "groups": [
+        "효성그룹"
+      ],
+      "event_count": 1
+    },
+    "노타": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "형지엘리트": {
+      "related_companies": [
+        "코데즈컴바인",
+        "아난티",
+        "제이에스티나",
+        "신원",
+        "양지사",
+        "인디에프",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 2
+    },
+    "JYP Ent.": {
+      "related_companies": [
+        "에스엠",
+        "와이지엔터테인먼트",
+        "하이브",
+        "SAMG엔터"
+      ],
+      "groups": [
+        "엔터테인먼트"
+      ],
+      "event_count": 1
+    },
+    "에스엠": {
+      "related_companies": [
+        "와이지엔터테인먼트",
+        "하이브",
+        "SAMG엔터",
+        "JYP Ent."
+      ],
+      "groups": [
+        "엔터테인먼트"
+      ],
+      "event_count": 1
+    },
+    "하이브": {
+      "related_companies": [
+        "에스엠",
+        "와이지엔터테인먼트",
+        "SAMG엔터",
+        "JYP Ent."
+      ],
+      "groups": [
+        "엔터테인먼트"
+      ],
+      "event_count": 1
+    },
+    "와이지엔터테인먼트": {
+      "related_companies": [
+        "에스엠",
+        "하이브",
+        "SAMG엔터",
+        "JYP Ent."
+      ],
+      "groups": [
+        "엔터테인먼트"
+      ],
+      "event_count": 1
+    },
+    "HD현대에너지솔루션": {
+      "related_companies": [
+        "HD현대",
+        "HD현대중공업",
+        "HD현대일렉트릭",
+        "HD현대미포",
+        "HD한국조선해양"
+      ],
+      "groups": [
+        "HD현대그룹"
+      ],
+      "event_count": 1
+    },
+    "현대오토에버": {
+      "related_companies": [
+        "기아",
+        "현대글로비스",
+        "현대차"
+      ],
+      "groups": [
+        "현대차그룹"
+      ],
+      "event_count": 1
+    },
+    "로보티즈": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "로보스타": {
+      "related_companies": [
+        "유일로보틱스",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "클로봇": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "로보로보": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "휴림로봇",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "휴림로봇": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "두산로보틱스",
+        "엔젤로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "엔젤로보틱스": {
+      "related_companies": [
+        "유일로보틱스",
+        "로보스타",
+        "클로봇",
+        "로보티즈",
+        "하이젠알앤엠",
+        "로보로보",
+        "휴림로봇",
+        "두산로보틱스",
+        "레인보우로보틱스"
+      ],
+      "groups": [
+        "로봇산업"
+      ],
+      "event_count": 1
+    },
+    "비아이매트릭스": {
+      "related_companies": [
+        "마음AI",
+        "카카오",
+        "플리토",
+        "신테카바이오"
+      ],
+      "groups": [
+        "AI산업"
+      ],
+      "event_count": 1
+    },
+    "SK바이오사이언스": {
+      "related_companies": [
+        "SK하이닉스",
+        "SK케미칼",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "SK그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB": {
+      "related_companies": [
+        "HLB테라퓨틱스",
+        "HLB이노베이션",
+        "HLB제약",
+        "HLB바이오스텝",
+        "HLB파나진",
+        "HLB생명과학"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB생명과학": {
+      "related_companies": [
+        "HLB테라퓨틱스",
+        "HLB이노베이션",
+        "HLB제약",
+        "HLB바이오스텝",
+        "HLB파나진",
+        "HLB"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB제약": {
+      "related_companies": [
+        "HLB테라퓨틱스",
+        "HLB이노베이션",
+        "HLB바이오스텝",
+        "HLB파나진",
+        "HLB",
+        "HLB생명과학"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB바이오스텝": {
+      "related_companies": [
+        "HLB테라퓨틱스",
+        "HLB이노베이션",
+        "HLB제약",
+        "HLB파나진",
+        "HLB",
+        "HLB생명과학"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB테라퓨틱스": {
+      "related_companies": [
+        "HLB이노베이션",
+        "HLB제약",
+        "HLB바이오스텝",
+        "HLB파나진",
+        "HLB",
+        "HLB생명과학"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB파나진": {
+      "related_companies": [
+        "HLB테라퓨틱스",
+        "HLB이노베이션",
+        "HLB제약",
+        "HLB바이오스텝",
+        "HLB",
+        "HLB생명과학"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HLB이노베이션": {
+      "related_companies": [
+        "HLB테라퓨틱스",
+        "HLB제약",
+        "HLB바이오스텝",
+        "HLB파나진",
+        "HLB",
+        "HLB생명과학"
+      ],
+      "groups": [
+        "HLB그룹"
+      ],
+      "event_count": 1
+    },
+    "HS효성첨단소재": {
+      "related_companies": [
+        "삼성SDI",
+        "효성중공업",
+        "엘앤에프",
+        "LG에너지솔루션",
+        "케이이엠텍",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "효성그룹",
+        "배터리산업"
+      ],
+      "event_count": 1
+    },
+    "케이이엠텍": {
+      "related_companies": [
+        "삼성SDI",
+        "엘앤에프",
+        "LG에너지솔루션",
+        "HS효성첨단소재",
+        "SK이노베이션"
+      ],
+      "groups": [
+        "배터리산업"
+      ],
+      "event_count": 1
+    },
+    "지노믹트리": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "신테카바이오": {
+      "related_companies": [
+        "마음AI",
+        "비아이매트릭스",
+        "카카오",
+        "플리토"
+      ],
+      "groups": [
+        "AI산업"
+      ],
+      "event_count": 1
+    },
+    "크래프톤": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "에이비프로바이오": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "셀트리온": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "코데즈컴바인": {
+      "related_companies": [
+        "형지엘리트",
+        "아난티",
+        "제이에스티나",
+        "신원",
+        "양지사",
+        "인디에프",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "양지사": {
+      "related_companies": [
+        "형지엘리트",
+        "코데즈컴바인",
+        "아난티",
+        "제이에스티나",
+        "신원",
+        "인디에프",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "좋은사람들": {
+      "related_companies": [
+        "형지엘리트",
+        "코데즈컴바인",
+        "아난티",
+        "제이에스티나",
+        "신원",
+        "양지사",
+        "인디에프"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "제이에스티나": {
+      "related_companies": [
+        "형지엘리트",
+        "코데즈컴바인",
+        "아난티",
+        "신원",
+        "양지사",
+        "인디에프",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "아난티": {
+      "related_companies": [
+        "형지엘리트",
+        "코데즈컴바인",
+        "제이에스티나",
+        "신원",
+        "양지사",
+        "인디에프",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "인디에프": {
+      "related_companies": [
+        "형지엘리트",
+        "코데즈컴바인",
+        "아난티",
+        "제이에스티나",
+        "신원",
+        "양지사",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "신원": {
+      "related_companies": [
+        "형지엘리트",
+        "코데즈컴바인",
+        "아난티",
+        "제이에스티나",
+        "양지사",
+        "인디에프",
+        "좋은사람들"
+      ],
+      "groups": [
+        "남북경협"
+      ],
+      "event_count": 1
+    },
+    "한성크린텍": {
+      "related_companies": [
+        "알파칩스",
+        "삼성전자",
+        "SK하이닉스",
+        "메가터치"
+      ],
+      "groups": [
+        "반도체산업"
+      ],
+      "event_count": 1
+    },
+    "달바글로벌": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    },
+    "알파칩스": {
+      "related_companies": [
+        "삼성전자",
+        "SK하이닉스",
+        "메가터치",
+        "한성크린텍"
+      ],
+      "groups": [
+        "반도체산업"
+      ],
+      "event_count": 1
+    },
+    "넥센타이어": {
+      "related_companies": [],
+      "groups": [],
+      "event_count": 1
+    }
+  },
+  "temporal_comovement": []
+}

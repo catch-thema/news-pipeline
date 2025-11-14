@@ -1,0 +1,9 @@
+# Kafka
+kafka-python==2.0.2
+
+# 데이터베이스
+psycopg2-binary==2.9.9
+
+# 유틸리티
+python-dotenv==1.0.0
+pydantic

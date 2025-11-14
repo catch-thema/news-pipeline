@@ -1,0 +1,300 @@
+# docker-compose.yml
+services:
+  # PostgreSQL
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: news-postgres
+    environment:
+      POSTGRES_DB: news_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - news-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - news-network
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: news-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - news-network
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: news-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - news-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+
+  crawling-api:
+    build:
+      context: crawling-server
+      dockerfile: Dockerfile
+    container_name: crawling-server-api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres/news_db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: news_data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - news-network
+    volumes:
+      - ./crawling-server:/app
+      - ./shared:/app/shared
+
+  crawling-worker:
+    build:
+      context: ./crawling
+      dockerfile: Dockerfile
+    container_name: crawling-worker
+    command: python -m worker.crawling
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: crawled_news
+      WORKER_CONCURRENCY: "5"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - news-network
+    volumes:
+      - ./crawling:/app
+      - ./shared:/app/shared
+#    deploy:
+#      replicas: 2
+
+  tagging-worker:
+    build:
+      context: ./tagging
+      dockerfile: Dockerfile
+    container_name: tagging-worker
+    command: python -m worker.tagging
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      NER_INPUT_TOPIC: crawled_news
+      NER_OUTPUT_TOPIC: tagged_news
+      NER_CONSUMER_GROUP: ner-worker-group
+      NER_MODEL: soddokayo/koelectra-base-klue-ner
+      NER_BATCH_SIZE: "10"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: news_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - news-network
+    volumes:
+      - ./tagging:/app
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+
+  llm-worker:
+    build:
+      context: ./tagging-llm
+      dockerfile: Dockerfile
+    container_name: llm-analysis-worker
+    command: python -m worker.analysis
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      LLM_INPUT_TOPIC: tagged_news
+      LLM_OUTPUT_TOPIC: analyzed_news
+      LLM_CONSUMER_GROUP: llm-analysis-worker
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LLM_MODEL: gpt-4o-mini
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: news_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - news-network
+    volumes:
+      - ./tagging-llm:/app
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+
+  reporting-worker:
+    build:
+      context: ./reporting
+      dockerfile: Dockerfile
+    container_name: reporting-worker
+    command: python -m worker.reporting
+    env_file:
+      - .env
+    environment:
+      # Kafka 설정
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REPORTING_INPUT_TOPIC=stock_ready
+      - REPORTING_CONSUMER_GROUP=reporting-worker
+
+      # OpenAI 설정
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+      # ChromaDB 설정
+      - CHROMA_HOST=${CHROMA_HOST:-chromadb}
+      - CHROMA_PORT=${CHROMA_PORT:-8000}
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - news-network
+    restart: unless-stopped
+    volumes:
+      - ./reporting:/app/reporting
+      - ./shared:/app/shared
+
+  rag-embedding-worker:
+    build:
+      context: ./embedding
+      dockerfile: Dockerfile
+    container_name: rag-embedding-worker
+    command: python -m worker.rag_embedding
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RAG_INPUT_TOPIC: analyzed_news
+      RAG_COMPLETE_TOPIC: embedding_complete
+      RAG_CONSUMER_GROUP: rag-embedding-worker
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    networks:
+      - news-network
+    volumes:
+      - ./embedding:/app/embedding
+      - ./shared:/app/shared
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+
+
+  aggregation-worker:
+    build:
+      context: ./aggregation
+      dockerfile: Dockerfile
+    container_name: aggregation-worker
+    command: python -m worker.aggregation
+    env_file:
+      - .env
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      AGGREGATION_INPUT_TOPIC: embedding_complete
+      AGGREGATION_OUTPUT_TOPIC: stock_ready
+      AGGREGATION_CONSUMER_GROUP: aggregation-worker
+      CHECK_INTERVAL_SECONDS: 10
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - news-network
+    restart: unless-stopped
+    volumes:
+      - ./aggregation:/app/aggregation
+      - ./shared:/app/shared
+
+volumes:
+  postgres_data:
+  kafka_data:
+
+networks:
+  news-network:
+    driver: bridge

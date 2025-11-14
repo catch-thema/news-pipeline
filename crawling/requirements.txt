@@ -1,0 +1,13 @@
+aio-pika==9.4.0
+playwright==1.40.0
+beautifulsoup4==4.12.2
+lxml==5.1.0
+aiohttp[speedups]==3.9.1
+brotli==1.1.0
+sqlalchemy[asyncio]==2.0.25
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+kafka-python==2.0.2
+python-dotenv==1.0.0
+httpx==0.25.2
+pydantic
