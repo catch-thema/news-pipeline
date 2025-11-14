@@ -101,6 +101,21 @@ services:
       - ./crawling-server:/app
       - ./shared:/app/shared
 
+  report-server:
+    build:
+      context: ./report-server
+      dockerfile: Dockerfile
+    container_name: report-server
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/news_db
+    depends_on:
+      - postgres
+    networks:
+      - news-network
+    restart: unless-stopped
+
   crawling-worker:
     build:
       context: ./crawling
