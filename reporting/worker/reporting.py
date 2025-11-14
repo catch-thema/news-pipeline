@@ -67,14 +67,19 @@ class ReportingWorker:
     def analyze_stock_movement(self, movement: StockMovementMessage) -> Dict:
         """주식 변동 분석"""
         try:
-            date_str = movement.date.replace('.', '-')
-            target_date = datetime.fromisoformat(f"{date_str}T00:00:00+09:00")
+            # 1. 메시지의 뉴스 수집 기간 사용
+            news_start_str = movement.news_start_date.replace('.', '-')
+            news_end_str = movement.news_end_date.replace('.', '-')
+
+            # timezone 없이 날짜만 파싱 (DB와 일치)
+            start_date = datetime.fromisoformat(f"{news_start_str}T00:00:00")
+            end_date = datetime.fromisoformat(f"{news_end_str}T23:59:59")
+
+            logger.info(f"검색 기간: {start_date} ~ {end_date}")
+
         except Exception as e:
             logger.error(f"날짜 파싱 오류: {e}")
             return None
-
-        start_date = target_date - timedelta(days=2)
-        end_date = target_date
 
         magnitude = abs(movement.change_rate)
 
@@ -85,8 +90,15 @@ class ReportingWorker:
             movement_text = "급등"
             keywords = ["상승", "급등", "상승세", "호재", "성장", "강세"]
 
+        try:
+            analysis_date = datetime.strptime(movement.date, "%Y.%m.%d")
+        except ValueError:
+            analysis_date = datetime.strptime(movement.date, "%Y-%m-%d")
+
         # 1. 명시적 원인 검색
         explicit_chunks = []
+        logger.info(f"티커 검색: {movement.ticker}, 종목명: {movement.stock_name}")
+
         base_query = f"{movement.stock_name} {movement_text} 원인 이유 배경"
         explicit_chunks.extend(self.hybrid_search.search(
             query=base_query,
@@ -96,6 +108,9 @@ class ReportingWorker:
             end_date=end_date,
             k=10
         ))
+
+        # 검색 결과 로그
+        logger.info(f"Base query 결과: {len(explicit_chunks)} chunks")
 
         # 변동률 강조 (5% 이상일 때)
         if magnitude >= 5.0:
@@ -122,6 +137,8 @@ class ReportingWorker:
 
         explicit_chunks = list({chunk['id']: chunk for chunk in explicit_chunks}.values())[:30]
 
+        logger.info(f"Explicit chunks 총: {len(explicit_chunks)}")
+
         # 2. 이벤트 검색
         event_queries = [
             movement.stock_name,
@@ -143,33 +160,55 @@ class ReportingWorker:
 
         event_chunks = list({chunk['id']: chunk for chunk in event_chunks}.values())[:30]
 
+        logger.info(f"Event chunks 총: {len(event_chunks)}")
+
         if not explicit_chunks and not event_chunks:
             logger.warning(f"관련 뉴스 없음: {movement.stock_name} ({movement.date})")
-            return None
+
+            # 디버깅: 날짜 필터 없이 검색
+            debug_chunks = self.hybrid_search.search(
+                query=movement.stock_name,
+                ticker=movement.ticker,
+                stock_name=movement.stock_name,
+                k=5
+            )
+            logger.info(f"날짜 필터 제거 시 결과: {len(debug_chunks)} chunks")
+            if debug_chunks:
+                logger.info(f"샘플 metadata: {debug_chunks[0].get('metadata', {})}")
+
+            return {
+                "causes": [],
+                "summary": "관련 뉴스를 찾을 수 없습니다.",
+                "total_confidence": "Low",
+                "explicit_chunks_found": 0,
+                "event_chunks_found": 0
+            }
 
         # 3. 원인 분석
         causes_result = analyze_causes(
             explicit_cause_chunks=explicit_chunks,
             event_chunks=event_chunks,
             ticker=movement.ticker,
-            date=target_date,
+            date=analysis_date,
             movement_type="down" if movement.trend_type == "plunge" else "up",
             change_rate=movement.change_rate
         )
 
         # 4. 각 원인에 뉴스 참조 추가
         for cause in causes_result.get("causes", []):
-            cause["news_references"] = self._extract_news_references(
+            news_refs, news_dates = self._extract_news_references(
                 explicit_chunks + event_chunks,
                 cause.get("evidence", [])
             )
+            cause["news_references"] = news_refs
+            cause["news_dates"] = news_dates
 
         # 5. 연관 종목 분석
-        related_stocks_result = analyze_related_stocks(
-            stock_name=movement.stock_name,
-            movement_type="down" if movement.trend_type == "plunge" else "up",
-            causes=causes_result.get("causes", [])
-        )
+        # related_stocks_result = analyze_related_stocks(
+        #     stock_name=movement.stock_name,
+        #     movement_type="down" if movement.trend_type == "plunge" else "up",
+        #     causes=causes_result.get("causes", [])
+        # )
 
         # 6. 시장 맥락 분석
         market_context = analyze_market_context(
@@ -180,35 +219,48 @@ class ReportingWorker:
 
         return {
             **causes_result,
-            "related_stocks": related_stocks_result.get("related_stocks", []),
+            # "related_stocks": related_stocks_result.get("related_stocks", []),
             "market_context": market_context,
             "explicit_chunks_found": len(explicit_chunks),
             "event_chunks_found": len(event_chunks)
         }
 
-    def _extract_news_references(self, chunks: List[Dict], evidence: List[str]) -> List[Dict]:
-        """증거에 사용된 청크에서 뉴스 참조 추출"""
+    def _extract_news_references(self, chunks: List[Dict], evidence: List[str]) -> tuple[List[Dict], List[str]]:
+        """증거에 사용된 청크에서 뉴스 참조 및 날짜 추출"""
         references = []
+        news_dates = set()
         seen_urls = set()
 
         for chunk in chunks:
-            # 청크 텍스트가 증거에 포함되는지 확인
-            chunk_text = chunk.get('text', '')
-            if any(ev in chunk_text for ev in evidence):
+            chunk_text = chunk.get('content') or chunk.get('text', '')
+
+            # evidence는 문자열 리스트
+            if any(ev and ev in chunk_text for ev in evidence):
                 metadata = chunk.get('metadata', {})
                 url = metadata.get('url')
+                published_at = metadata.get('published_at', '')
+
+                # 날짜 수집
+                if published_at:
+                    try:
+                        # ISO 형식으로 변환 (YYYY-MM-DD)
+                        date_obj = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                        news_dates.add(date_obj.strftime('%Y-%m-%d'))
+                    except:
+                        pass
 
                 if url and url not in seen_urls:
                     seen_urls.add(url)
                     references.append({
                         "title": metadata.get('title', '제목 없음'),
                         "url": url,
-                        "published_at": metadata.get('published_at', ''),
+                        "published_at": published_at,
                         "publisher": metadata.get('publisher', ''),
                         "relevance_score": chunk.get('score', 0.0)
                     })
 
-        return sorted(references, key=lambda x: x['relevance_score'], reverse=True)[:5]
+        sorted_refs = sorted(references, key=lambda x: x['relevance_score'], reverse=True)[:5]
+        return sorted_refs, sorted(list(news_dates))
 
 
     def save_report(self, report: StockReport):
@@ -330,6 +382,11 @@ class ReportingWorker:
         else:
             change_magnitude = "상승" if movement_type == "up" else "하락"
 
+        try:
+            analysis_date = datetime.strptime(movement.date, "%Y.%m.%d")
+        except ValueError:
+            analysis_date = datetime.strptime(movement.date, "%Y-%m-%d")
+
         # 신뢰도 분포 계산
         confidence_distribution = {}
         for cause in analysis_result.get("causes", []):
@@ -340,7 +397,7 @@ class ReportingWorker:
         report = StockReport(
             ticker=movement.ticker,
             stock_name=movement.stock_name,
-            analysis_date=movement.date,
+            analysis_date=analysis_date,
             movement_type=movement_type,
             change_rate=movement.change_rate,
             change_magnitude=change_magnitude,

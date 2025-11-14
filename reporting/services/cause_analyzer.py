@@ -82,29 +82,18 @@ def analyze_causes(
       "title": "원인 제목 (10자 이내)",
       "description": "상세 설명 (2-3문장)",
       "confidence": "High|Medium|Low",
-      "contribution_score": 85,  // 0~100, 독립적 평가
-      "event_type": "earnings|order|guidance|supply_chain|macro|regulation|product|other",
+      "category": "earnings|order|guidance|supply_chain|macro|regulation|product|other",
+      "impact_score": 85,
       "evidence": [
-        {{
-          "quote": "근거 인용문 (핵심 1-2문장)",
-          "source_url": "URL",
-          "source_title": "제목",
-          "published_at": "날짜",
-          "source_type": "explicit|event"
-        }}
+        "근거 인용문 1 (핵심 1-2문장)",
+        "근거 인용문 2"
       ],
-      "keywords": ["키워드1", "키워드2"],
-      "news_count": 5  // 근거 뉴스 개수
+      "news_dates": ["2025-01-15", "2025-01-16"],
+      "keywords": ["키워드1", "키워드2"]
     }}
   ],
   "summary": "종합 요약 (3-4문장)",
-  "total_confidence": "High|Medium|Low",
-  "analysis_metadata": {{
-    "total_news_analyzed": 15,
-    "explicit_news_count": 8,
-    "event_news_count": 7,
-    "causes_count": 2
-  }}
+  "total_confidence": "High|Medium|Low"
 }}
 """
 

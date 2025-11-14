@@ -101,11 +101,10 @@ class RAGService:
 
             if ticker:
                 conditions.append("metadata->>'ticker' = %s")
-                params.append(ticker)
-
+                params.append(str(ticker))  # 명시적 문자열 변환
             elif stock_name:
                 conditions.append("metadata->>'stock_name' = %s")
-                params.append(stock_name)
+                params.append(str(stock_name))
 
             if start_date:
                 conditions.append("(metadata->>'published_at')::timestamp >= %s")
@@ -118,18 +117,18 @@ class RAGService:
             where_clause = " AND ".join(conditions)
 
             sql = f"""
-                SELECT
-                    chunk_text as content,
-                    metadata,
-                    1 - (embedding <=> %s::vector) as similarity,
-                    embedding <=> %s::vector as distance
-                FROM news_chunks
-                WHERE {where_clause}
-                ORDER BY embedding <=> %s::vector
-                LIMIT %s
-            """
+                        SELECT
+                            chunk_text as content,
+                            metadata,
+                            1 - (embedding <=> %s::vector) as similarity,
+                            embedding <=> %s::vector as distance
+                        FROM news_chunks
+                        WHERE {where_clause}
+                        ORDER BY embedding <=> %s::vector
+                        LIMIT %s
+                    """
 
-            all_params = [query_embedding, query_embedding, query_embedding] + params + [n_results]
+            all_params = [query_embedding, query_embedding] + params + [query_embedding, n_results]
 
             with self.db_manager.get_connection() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:

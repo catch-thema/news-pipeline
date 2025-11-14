@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Dict, Literal, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class NewsReference(BaseModel):
     """뉴스 참조 정보"""
@@ -10,6 +10,22 @@ class NewsReference(BaseModel):
     publisher: str
     relevance_score: float = 0.0
 
+class Evidence(BaseModel):
+    """증거 구조"""
+    quote: str
+    source_type: Literal["explicit", "event"]
+
+class Cause(BaseModel):
+    """주가 변동 원인"""
+    rank: int
+    title: str
+    description: str
+    evidence: List[str]  # 문자열 리스트로 변경
+    confidence: Literal["High", "Medium", "Low"]
+    category: str
+    impact_score: float
+    news_references: List[NewsReference] = Field(default_factory=list)
+    news_dates: List[str] = Field(default_factory=list)  # 기본값 추가
 
 class CauseDetail(BaseModel):
     rank: int
@@ -37,7 +53,7 @@ class RelatedStock(BaseModel):
 class StockReport(BaseModel):
     ticker: str
     stock_name: str
-    analysis_date: str
+    analysis_date: date
     movement_type: Literal["up", "down"]
     change_rate: float  # 변동률 추가
     change_magnitude: str  # "급등", "급락", "상승", "하락"
