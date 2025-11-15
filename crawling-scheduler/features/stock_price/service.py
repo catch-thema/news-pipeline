@@ -15,6 +15,13 @@ class StockPriceService:
         self.repository = StockPriceRepository(db)
         self.krx_client = KRXClient()
 
+    def get_stock_info_by_code_and_date(self, stock_code: str, target_date: datetime):
+        stock_price_info = self.repository.find_stock_by_code_and_date(
+            stock_code, datetime.combine(target_date, datetime.min.time())
+        )
+
+        return stock_price_info
+
     def fetch_and_save_stock_prices(self, target_date: str = None) -> int:
         if target_date is None:
             target_date = datetime.now().strftime(DateFormats.KRX_DATE_FORMAT)

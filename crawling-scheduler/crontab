@@ -1,0 +1,17 @@
+# 환경변수 설정 (중요!)
+PATH=/usr/local/bin:/usr/bin:/bin
+PYTHONUNBUFFERED=1
+
+# ============================================
+# 테스트용: 5분마다 실행
+# ============================================
+*/5 * * * * echo "[$(date)] Starting scheduled task..." >> /var/log/cron.log 2>&1 && cd /app && /usr/local/bin/python -m scripts.scheduler >> /var/log/cron.log 2>&1 && echo "[$(date)] Task completed." >> /var/log/cron.log 2>&1
+
+# ============================================
+# 운영용: 평일 12:00와 23:00에 실행 (한국 시간 기준)
+# 분 시 일 월 요일 (0=일요일, 1=월요일, ..., 6=토요일)
+# ============================================
+# 0 12 * * 1-5 echo "[$(date)] Starting scheduled task..." >> /var/log/cron.log 2>&1 && cd /app && /usr/local/bin/python /app/scripts/scheduler.py >> /var/log/cron.log 2>&1 && echo "[$(date)] Task completed." >> /var/log/cron.log 2>&1
+# 0 23 * * 1-5 echo "[$(date)] Starting scheduled task..." >> /var/log/cron.log 2>&1 && cd /app && /usr/local/bin/python /app/scripts/scheduler.py >> /var/log/cron.log 2>&1 && echo "[$(date)] Task completed." >> /var/log/cron.log 2>&1
+
+# Empty line required at end of file
