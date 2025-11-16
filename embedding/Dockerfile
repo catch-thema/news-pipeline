@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/embedding
 
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app:/app/shared/common:$PYTHONPATH
 
 WORKDIR /app/embedding
 

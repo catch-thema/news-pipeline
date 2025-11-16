@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import reports
+from app.routers import chat
 
 app = FastAPI(
     title="Stock Report API",
@@ -19,6 +20,7 @@ app.add_middleware(
 
 # 라우터 등록
 app.include_router(reports.router)
+app.include_router(chat.router)
 
 
 @app.get("/")

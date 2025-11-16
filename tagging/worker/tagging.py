@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 from typing import Dict
 
 # 외부 라이브러리
@@ -11,9 +10,9 @@ from pydantic import ValidationError
 
 
 # shared 모듈 import
-from shared.config import NERWorkerConfig
-from shared.db_manager import DBManager
-from shared.models.messages import CrawledNewsMessage, TaggedNewsMessage, ExtractedEntities
+from shared.common.config import NERWorkerConfig
+from shared.common.config import get_postgres_connection
+from shared.common.models import CrawledNewsMessage, TaggedNewsMessage, ExtractedEntities
 
 
 logging.basicConfig(
@@ -27,15 +26,6 @@ class NERTaggingWorker:
     def __init__(self):
         """NER 워커 초기화"""
         self.config = NERWorkerConfig()
-
-        # DB Manager
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
 
         # NER 모델 로드
         logger.info(f"NER 모델 로딩: {self.config.NER_MODEL}")
@@ -108,7 +98,7 @@ class NERTaggingWorker:
         """엔티티를 DB에 저장"""
         news_id = news.url
         try:
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         INSERT INTO tagged_news
@@ -223,7 +213,6 @@ class NERTaggingWorker:
         if self.producer:
             self.producer.flush()
             self.producer.close()
-        self.db_manager.close()
         logger.info("NER 워커 종료 완료")
 
 

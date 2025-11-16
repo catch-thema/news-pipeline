@@ -3,6 +3,9 @@ from typing import List, Optional, Dict, Any
 from datetime import date, datetime
 from decimal import Decimal
 
+class ChatQuestionRequest(BaseModel):
+    question: str
+
 
 class NewsReference(BaseModel):
     """뉴스 참조"""

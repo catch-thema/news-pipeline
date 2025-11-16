@@ -3,14 +3,14 @@ import logging
 import time
 from datetime import datetime
 from collections import defaultdict
-from typing import Dict, Set, Tuple
+from typing import Dict, Tuple
 
 from kafka import KafkaConsumer, KafkaProducer
 from pydantic import ValidationError
 
-from shared.config import AggregationWorkerConfig
-from shared.db_manager import DBManager
-from shared.models.messages import EmbeddingCompleteMessage, StockMovementMessage
+from shared.common.config import AggregationWorkerConfig
+from shared.common.config import get_postgres_connection
+from shared.common.models import EmbeddingCompleteMessage, StockMovementMessage
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,14 +24,6 @@ class AggregationWorker:
 
     def __init__(self):
         self.config = AggregationWorkerConfig()
-
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
 
         # embedding_complete 토픽 구독
         self.consumer = KafkaConsumer(
@@ -70,7 +62,7 @@ class AggregationWorker:
         news_start_date = message.news_start_date
         news_end_date = message.news_end_date
 
-        with self.db_manager.get_connection() as conn:
+        with get_postgres_connection() as conn:
             with conn.cursor() as cursor:
                 # 1. 크롤링된 뉴스 수 (published_at 기준)
                 cursor.execute("""
@@ -233,7 +225,6 @@ class AggregationWorker:
         logger.info("워커 종료 중...")
         self.consumer.close()
         self.producer.close()
-        self.db_manager.close()
         logger.info("Aggregation 워커 종료 완료")
 
 

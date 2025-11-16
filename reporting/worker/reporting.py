@@ -1,19 +1,18 @@
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List
 from kafka import KafkaConsumer
 from pydantic import ValidationError
 
-from shared.config import ReportingWorkerConfig
-from shared.db_manager import DBManager
-from shared.models.messages import StockMovementMessage
-from shared.services.rag_service import RAGService
-from shared.services.bm25_service import BM25Service
-from shared.services.hybrid_search_service import HybridSearchService
+from shared.common.config import ReportingWorkerConfig
+from shared.common.config import get_postgres_connection
+from shared.common.models import StockMovementMessage
+from shared.llm.rag_service import RAGService
+from shared.llm.bm25_service import BM25Service
+from shared.llm.hybrid_search_service import HybridSearchService
 
 from reporting.services.cause_analyzer import analyze_causes
-from reporting.services.related_stocks_analyzer import analyze_related_stocks
 from reporting.models.report import StockReport
 from reporting.services.market_context_analyzer import analyze_market_context
 
@@ -30,13 +29,6 @@ class ReportingWorker:
 
     def __init__(self):
         self.config = ReportingWorkerConfig()
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
 
         # Kafka Consumer 설정
         self.consumer = KafkaConsumer(
@@ -266,7 +258,7 @@ class ReportingWorker:
     def save_report(self, report: StockReport):
         """리포트를 DB에 저장"""
         try:
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                     INSERT INTO stock_reports
@@ -316,7 +308,7 @@ class ReportingWorker:
     def get_stock_price_data(self, ticker: str, date: str) -> Dict:
         """주가 변동 데이터 조회"""
         try:
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         SELECT stock_name, change_rate, trend_type
@@ -454,7 +446,6 @@ class ReportingWorker:
     def close(self):
         """리소스 정리"""
         self.consumer.close()
-        self.db_manager.close()
         logger.info("워커 종료 완료")
 
 

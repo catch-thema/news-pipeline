@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from .settings import settings
 
 DATABASE_URL = (
-    f"mysql+pymysql://{settings.db_user}:{settings.db_password}"
-    f"@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+    f"mysql+pymysql://{settings.mysql_user}:{settings.mysql_password}"
+    f"@{settings.mysql_host}:{settings.mysql_port}/{settings.mysql_db}"
     f"?charset=utf8mb4"
 )
 

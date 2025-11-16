@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from shared.services.rag_service import RAGService
-from shared.services.bm25_service import BM25Service
+from shared.llm.rag_service import RAGService
+from shared.llm.bm25_service import BM25Service
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 

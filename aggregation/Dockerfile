@@ -13,12 +13,13 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 # 애플리케이션 코드 복사
 COPY . /app/aggregation/
 
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app:/app/shared/common:$PYTHONPATH
 
 WORKDIR /app/aggregation
 
 # 워커 실행
-CMD ["python", "-u", "aggregation/worker/aggregation.py"]
+CMD ["python", "-u", "worker.aggregation.py"]

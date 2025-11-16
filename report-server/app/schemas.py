@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Date, Numeric, Text, TIMESTAMP, CheckConstraint
 from sqlalchemy.dialects.postgresql import JSONB
-from app.database import Base
+from shared.common.config import postgres_base
 
 
-class StockReport(Base):
+class StockReport(postgres_base):
     __tablename__ = "stock_reports"
 
     id = Column(Integer, primary_key=True, index=True)

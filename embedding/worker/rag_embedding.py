@@ -5,11 +5,10 @@ from typing import Dict
 from kafka import KafkaConsumer, KafkaProducer
 from pydantic import ValidationError
 
-from shared.config import RAGEmbeddingWorkerConfig
-from shared.db_manager import DBManager
-from shared.models.messages import EmbeddingCompleteMessage, AnalyzedNewsMessage
+from shared.common.config import RAGEmbeddingWorkerConfig
+from shared.common.models import EmbeddingCompleteMessage, AnalyzedNewsMessage
 from embedding.services.news_chunker import NewsChunker
-from shared.services.rag_service import RAGService
+from shared.llm.rag_service import RAGService
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,14 +20,6 @@ logger = logging.getLogger(__name__)
 class RAGEmbeddingWorker:
     def __init__(self):
         self.config = RAGEmbeddingWorkerConfig()
-
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
 
         self.chunker = NewsChunker(
             chunk_size=self.config.CHUNK_SIZE,

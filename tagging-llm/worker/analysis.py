@@ -5,9 +5,9 @@ from kafka import KafkaConsumer, KafkaProducer
 from openai import OpenAI
 from pydantic import ValidationError
 
-from shared.config import LLMWorkerConfig
-from shared.db_manager import DBManager
-from shared.models.messages import TaggedNewsMessage, AnalyzedNewsMessage, LLMAnalysis
+from shared.common.config import LLMWorkerConfig
+from shared.common.config import get_postgres_connection
+from shared.common.models import TaggedNewsMessage, AnalyzedNewsMessage, LLMAnalysis
 
 
 logging.basicConfig(
@@ -20,13 +20,6 @@ logger = logging.getLogger(__name__)
 class LLMAnalysisWorker:
     def __init__(self):
         self.config = LLMWorkerConfig()
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
 
         self.llm_client = OpenAI(api_key=self.config.OPENAI_API_KEY)
 
@@ -110,7 +103,7 @@ class LLMAnalysisWorker:
         news_id = news.url
 
         try:
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE tagged_news
@@ -212,7 +205,6 @@ class LLMAnalysisWorker:
         if self.producer:
             self.producer.flush()
             self.producer.close()
-        self.db_manager.close()
         logger.info("LLM 워커 종료 완료")
 
 

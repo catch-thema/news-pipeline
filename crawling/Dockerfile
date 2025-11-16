@@ -26,12 +26,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 # Playwright Chromium만 설치 (의존성은 수동 설치했으므로 --with-deps 제외)
 RUN playwright install chromium
 
 COPY . /app/crawling
 
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app:/app/shared/common:$PYTHONPATH
 
 WORKDIR /app/crawling
 

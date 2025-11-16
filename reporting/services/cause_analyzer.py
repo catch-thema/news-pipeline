@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from datetime import datetime
 import json
 
-from shared.config import ReportingWorkerConfig
+from shared.common.config import ReportingWorkerConfig
 
 
 config = ReportingWorkerConfig()

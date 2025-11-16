@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date, datetime
-from app.database import get_db
 from app.schemas import StockReport
 from app.models import StockReportSummary, StockReportDetail
+
+from shared.common.config import get_postgres_session
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
@@ -16,7 +17,7 @@ def get_reports(
     ticker: Optional[str] = None,
     movement_type: Optional[str] = None,
     confidence: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_postgres_session)
 ):
     """리포트 목록 조회"""
     query = db.query(StockReport)
@@ -39,7 +40,7 @@ def get_reports(
 @router.get("/date/{target_date}", response_model=List[StockReportSummary])
 def get_reports_by_date(
     target_date: date,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_postgres_session)
 ):
     """특정 날짜의 리포트 조회"""
     reports = db.query(StockReport).filter(
@@ -55,7 +56,7 @@ def get_reports_by_date(
 
 
 @router.get("/today", response_model=List[StockReportSummary])
-def get_today_reports(db: Session = Depends(get_db)):
+def get_today_reports(db: Session = Depends(get_postgres_session)):
     """오늘의 리포트 조회"""
     today = date.today()
     reports = db.query(StockReport).filter(
@@ -73,7 +74,7 @@ def get_today_reports(db: Session = Depends(get_db)):
 @router.get("/{report_id}", response_model=StockReportDetail)
 def get_report_detail(
     report_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_postgres_session)
 ):
     """리포트 상세 조회"""
     report = db.query(StockReport).filter(StockReport.id == report_id).first()

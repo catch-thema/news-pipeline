@@ -2,16 +2,16 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict
 
 import aio_pika
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 from pydantic import ValidationError
 
-from shared.config import CrawlingWorkerConfig
-from shared.db_manager import DBManager
-from shared.models.messages import CrawlTaskMessage, CrawledNewsMessage
+from shared.common.config import CrawlingWorkerConfig
+from shared.common.config import get_postgres_connection
+from shared.common.models import CrawlTaskMessage, CrawledNewsMessage
 from worker.scripts.collect_urls import collect_urls_stream
 from worker.scripts.async_crawl import crawl_single_url
 
@@ -27,15 +27,6 @@ class CrawlingWorker:
 
     def __init__(self):
         self.config = CrawlingWorkerConfig()
-
-        # DB Manager 초기화
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
 
         # Kafka Producer 초기화
         self.producer = KafkaProducer(
@@ -53,7 +44,7 @@ class CrawlingWorker:
     def save_to_db(self, news_data: Dict, task: CrawlTaskMessage) -> bool:
         """크롤링한 뉴스를 DB에 저장"""
         try:
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         INSERT INTO news (url, title, content, ticker, stock_name, published_at, publisher, created_at)
@@ -270,7 +261,6 @@ class CrawlingWorker:
             finally:
                 await connection.close()
                 self.producer.close()
-                self.db_manager.close()
 
 
 async def main():

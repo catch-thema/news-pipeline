@@ -133,11 +133,17 @@ services:
       - "8001:8001"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/news_db
+    env_file:
+      - .env
     depends_on:
       - postgres
     networks:
       - news-network
     restart: unless-stopped
+    volumes:
+      - ./report-server:/app
+      - ./shared:/app/shared
+      - ./reporting:/app/reporting
 
   crawling-scheduler:
     build:

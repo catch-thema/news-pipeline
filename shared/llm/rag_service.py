@@ -1,13 +1,14 @@
-# shared/services/rag_service.py
+# shared/llm/rag_service.py
 
 import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-import openai
 from psycopg2.extras import RealDictCursor, Json
 
-from shared.db_manager import DBManager
-from shared.config import RAGServiceConfig
+import openai
+
+from shared.common.config import get_postgres_connection
+from shared.common.config import RAGServiceConfig
 
 logger = logging.getLogger(__name__)
 
@@ -20,15 +21,6 @@ class RAGService:
         self.client = openai.OpenAI(api_key=self.config.OPENAI_API_KEY)
         self.model = self.config.EMBEDDING_MODEL
 
-        # DB 매니저 초기화
-        self.db_manager = DBManager(
-            host=self.config.DB_HOST,
-            port=self.config.DB_PORT,
-            database=self.config.DB_NAME,
-            user=self.config.DB_USER,
-            password=self.config.DB_PASSWORD
-        )
-
     def get_embedding(self, text: str) -> List[float]:
         """텍스트를 임베딩 벡터로 변환"""
         response = self.client.embeddings.create(
@@ -40,7 +32,7 @@ class RAGService:
     def add_news_chunks(self, chunks: List[str], metadata: Dict):
         """청크들을 DB에 임베딩과 함께 저장"""
         try:
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor() as cursor:
                     for idx, chunk in enumerate(chunks):
                         embedding = self.get_embedding(chunk)
@@ -130,7 +122,7 @@ class RAGService:
 
             all_params = [query_embedding, query_embedding] + params + [query_embedding, n_results]
 
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                     cursor.execute(sql, all_params)
                     results = cursor.fetchall()
@@ -211,7 +203,7 @@ class RAGService:
             if limit:
                 sql += f" LIMIT {limit}"
 
-            with self.db_manager.get_connection() as conn:
+            with get_postgres_connection() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                     cursor.execute(sql, params)
                     results = cursor.fetchall()
@@ -231,4 +223,4 @@ class RAGService:
 
     def close(self):
         """리소스 정리"""
-        self.db_manager.close()
+        pass

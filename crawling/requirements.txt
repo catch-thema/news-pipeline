@@ -11,3 +11,7 @@ kafka-python==2.0.2
 python-dotenv==1.0.0
 httpx==0.25.2
 pydantic
+sqlalchemy
+pydantic-settings
+psycopg2-binary
+pymysql
