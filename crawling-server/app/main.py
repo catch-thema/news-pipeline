@@ -17,7 +17,7 @@ RABBIT_URL = os.getenv("RABBIT_URL", "amqp://guest:guest@localhost/")
 class QueryRequest(BaseModel):
     query: str
     ticker: Optional[str] = None
-    pages: Optional[int] = 1
+    pages: Optional[int] = 1 
     delay: Optional[float] = 1.0
     crawl_concurrency: Optional[int] = 8
     out: Optional[str] = None
@@ -27,6 +27,7 @@ class QueryRequest(BaseModel):
     stock_name: Optional[str] = None
     change_rate: Optional[float] = None
     trend_type: Optional[str] = None  # "plunge" or "surge"
+    section: Optional[str] = None
 
 app = FastAPI()
 
@@ -330,6 +331,17 @@ async def publish_task(req: QueryRequest):
     )
     await app.state.channel.default_exchange.publish(message, routing_key="crawl_tasks")
     return {"status": "published", "query": req.query}
+
+@app.post("/publish-section")
+async def publish_section_task(req: QueryRequest):
+    payload = req.dict()
+    message = aio_pika.Message(
+        body=json.dumps(payload, ensure_ascii=False).encode(),
+        delivery_mode=DeliveryMode.PERSISTENT,
+    )
+    await app.state.channel.default_exchange.publish(message, routing_key="crawl_headlines_tasks")
+    return {"status": "published", "query": req.query}
+
 
 @app.get("/health")
 async def health():

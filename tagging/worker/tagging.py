@@ -170,7 +170,8 @@ class NERTaggingWorker:
             date=news.date,
             news_start_date=news.news_start_date,
             news_end_date=news.news_end_date,
-            entities=entities
+            entities=entities,
+            section=news.section,
         )
         self.producer.send(self.config.OUTPUT_TOPIC, value=tagged_news.dict())
 

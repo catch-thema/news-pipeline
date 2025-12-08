@@ -142,6 +142,11 @@ CREATE TABLE IF NOT EXISTS stock_reports (
     -- 시장 맥락 정보
     market_context JSONB,  -- MarketContext 객체
 
+    graph_neighbors JSONB DEFAULT '[]',
+
+    -- 추가: LLM 영향 전파 분석
+    impact_propagation JSONB,
+
     -- 타임스탬프
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -179,6 +184,25 @@ CREATE INDEX idx_stock_reports_analysis_quality ON stock_reports USING GIN(analy
 
 -- 특정 JSONB 필드 검색용
 CREATE INDEX idx_stock_reports_total_news ON stock_reports((analysis_quality->>'total_news_count'));
+
+-- ===================================
+-- 뉴스 요약 리포트
+-- ===================================
+
+CREATE TABLE IF NOT EXISTS section_reports (
+    id SERIAL PRIMARY KEY,
+    section VARCHAR(100) NOT NULL,
+    report_start_date DATE NOT NULL,
+    report_end_date DATE NOT NULL,
+    keywords JSONB DEFAULT '[]',
+    main_trends TEXT[], -- 주요 흐름 리스트
+    key_news JSONB,     -- 핵심 뉴스 배열 (headline, summary, url 등)
+    summary TEXT,       -- 전체 요약
+    news_urls TEXT[],   -- 포함된 뉴스 URL 목록
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT unique_section_report UNIQUE (section, report_start_date, report_end_date)
+);
 
 -- ===================================
 -- 자동 업데이트 트리거

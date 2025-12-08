@@ -81,10 +81,27 @@ class StockReportDetail(BaseModel):
     total_confidence: str
     related_stocks: List[RelatedStock] = Field(default_factory=list)
     market_context: Optional[MarketContext] = None
+    graph_neighbors: List[Dict[str, Any]] = Field(default_factory=list)
+    impact_propagation: Optional[Dict[str, Any]] = None
     analysis_quality: AnalysisQuality
     created_at: datetime
     updated_at: datetime
     triggered_at: Optional[datetime] = None
     report_metadata: Dict[str, Any] = Field(default_factory=dict, alias='metadata')
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+class SectionReportSummary(BaseModel):
+    id: Optional[int] = None
+    section: Optional[str] = None
+    report_start_date: Optional[date] = None
+    report_end_date: Optional[date] = None
+    keywords: Optional[List[dict]] = None
+    main_trends: Optional[List[str]] = None
+    key_news: Optional[Any] = None
+    summary: Optional[str] = None
+    news_urls: Optional[List[str]] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)

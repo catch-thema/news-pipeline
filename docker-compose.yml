@@ -194,6 +194,28 @@ services:
 #    deploy:
 #      replicas: 2
 
+  crawling-section-worker:
+    build:
+      context: ./crawling-section
+      dockerfile: Dockerfile
+    container_name: crawling-section-worker
+    command: python -m worker.crawling
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: crawled_news
+      WORKER_CONCURRENCY: "5"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - news-network
+    volumes:
+      - ./crawling-section:/app
+      - ./shared:/app/shared
+
   tagging-worker:
     build:
       context: ./tagging
@@ -293,6 +315,32 @@ services:
     restart: unless-stopped
     volumes:
       - ./reporting:/app/reporting
+      - ./shared:/app/shared
+
+  reporting-section-worker:
+    build:
+      context: ./reporting-section
+      dockerfile: Dockerfile
+    container_name: reporting-section-worker
+    command: python -m worker.reporting
+    env_file:
+      - .env
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REPORTING_INPUT_TOPIC=section_ready
+      - REPORTING_CONSUMER_GROUP=reporting-section-worker
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - news-network
+    restart: unless-stopped
+    volumes:
+      - ./reporting-section:/app/reporting
       - ./shared:/app/shared
 
   rag-embedding-worker:

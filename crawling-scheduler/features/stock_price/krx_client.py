@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Dict, List
 
 import httpx
+import logging
 
 from config.constants import (
     KRXEndpoints,
@@ -77,6 +78,8 @@ class KRXClient:
             response = self.client.post(
                 KRXEndpoints.DATA_FETCH, data=data, headers=headers
             )
+            logging.info(f"Response status: {response.status_code}")
+            logging.info(f"Response body: {response.text}")
             response.raise_for_status()
             json_data = response.json()
 

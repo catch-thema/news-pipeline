@@ -69,6 +69,9 @@ class StockReport(BaseModel):
     # 시장 맥락
     market_context: Optional[MarketContext] = None
 
+    graph_neighbors: list = []
+    impact_propagation: dict | None = None
+
     # 타임스탬프
     created_at: datetime
     triggered_at: Optional[datetime] = None  # 트리거 시각

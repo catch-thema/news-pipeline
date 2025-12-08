@@ -26,4 +26,3 @@ pydantic_settings
 sqlalchemy
 pymysql
 openai
-networkx==3.3

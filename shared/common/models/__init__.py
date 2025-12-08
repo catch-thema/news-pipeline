@@ -8,6 +8,8 @@ from .messages import (
     AnalyzedNewsMessage,
     EmbeddingCompleteMessage,
     StockMovementMessage,
+    CrawlHeadlinesTaskMessage,
+    HeadlineAnalysisMessage
 )
 
 __all__ = [
@@ -20,4 +22,6 @@ __all__ = [
     "AnalyzedNewsMessage",
     "EmbeddingCompleteMessage",
     "StockMovementMessage",
+    "CrawlHeadlinesTaskMessage",
+    "HeadlineAnalysisMessage"
 ]

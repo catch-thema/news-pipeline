@@ -14,7 +14,9 @@ from shared.llm.hybrid_search_service import HybridSearchService
 
 from reporting.services.cause_analyzer import analyze_causes
 from reporting.models.report import StockReport
-from reporting.services.market_context_analyzer import analyze_market_context
+from reporting.services.market_context_analyzer import MarketContextService
+from reporting.services.llm_propagation import LLMPropagationService
+from reporting.services.graph_service import GraphService
 
 
 logging.basicConfig(
@@ -48,6 +50,9 @@ class ReportingWorker:
         self.rag_service = RAGService()
         self.bm25_service = BM25Service()
         self.hybrid_search = HybridSearchService(self.rag_service, self.bm25_service)
+        self.graph_service = GraphService("relationship_graph_llm.pkl")
+        self.propagation_service = LLMPropagationService()
+        self.market_context_service = MarketContextService()
 
         # BM25 인덱스 구축
         logger.info("BM25 인덱스 구축 중...")
@@ -186,7 +191,7 @@ class ReportingWorker:
             change_rate=movement.change_rate
         )
 
-        # 4. 각 원인에 뉴스 참조 추가
+            # 4. 각 원인에 뉴스 참조 추가
         for cause in causes_result.get("causes", []):
             news_refs, news_dates = self._extract_news_references(
                 explicit_chunks + event_chunks,
@@ -195,15 +200,21 @@ class ReportingWorker:
             cause["news_references"] = news_refs
             cause["news_dates"] = news_dates
 
-        # 5. 연관 종목 분석
-        # related_stocks_result = analyze_related_stocks(
-        #     stock_name=movement.stock_name,
-        #     movement_type="down" if movement.trend_type == "plunge" else "up",
-        #     causes=causes_result.get("causes", [])
-        # )
+        graph_neighbors = self.graph_service.get_related_stocks(
+            movement.ticker,
+            max_depth=2
+        )
+        logger.info(f"그래프 이웃 종목 수: {len(graph_neighbors)}")
+
+        propagation_result = self.propagation_service.analyze_propagation(
+            stock_name=movement.stock_name,
+            causes=causes_result.get("causes", []),
+            graph_neighbors=graph_neighbors
+        )
+        logger.info("LLM 영향 전파 분석 완료")
 
         # 6. 시장 맥락 분석
-        market_context = analyze_market_context(
+        market_context = self.market_context_service.analyze_market_context(
             ticker=movement.ticker,
             stock_name=movement.stock_name,
             causes=causes_result.get("causes", [])
@@ -214,7 +225,9 @@ class ReportingWorker:
             # "related_stocks": related_stocks_result.get("related_stocks", []),
             "market_context": market_context,
             "explicit_chunks_found": len(explicit_chunks),
-            "event_chunks_found": len(event_chunks)
+            "event_chunks_found": len(event_chunks),
+            "graph_neighbors": graph_neighbors,
+            "impact_propagation": propagation_result
         }
 
     def _extract_news_references(self, chunks: List[Dict], evidence: List[str]) -> tuple[List[Dict], List[str]]:
@@ -264,8 +277,9 @@ class ReportingWorker:
                     INSERT INTO stock_reports
                     (ticker, stock_name, analysis_date, movement_type, change_rate, change_magnitude,
                      causes, summary, total_confidence, related_stocks, market_context,
+                      graph_neighbors, impact_propagation,        
                      triggered_at, metadata, analysis_quality, created_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (ticker, analysis_date, movement_type)
                     DO UPDATE SET
                         change_rate = EXCLUDED.change_rate,
@@ -275,6 +289,8 @@ class ReportingWorker:
                         total_confidence = EXCLUDED.total_confidence,
                         related_stocks = EXCLUDED.related_stocks,
                         market_context = EXCLUDED.market_context,
+                        graph_neighbors = EXCLUDED.graph_neighbors,       
+                        impact_propagation = EXCLUDED.impact_propagation,
                         triggered_at = EXCLUDED.triggered_at,
                         metadata = EXCLUDED.metadata,
                         analysis_quality = EXCLUDED.analysis_quality,
@@ -294,6 +310,8 @@ class ReportingWorker:
                                    ensure_ascii=False),
                         json.dumps(report.market_context.dict() if report.market_context else None,
                                    ensure_ascii=False),
+                        json.dumps(report.graph_neighbors, ensure_ascii=False),
+                        json.dumps(report.impact_propagation, ensure_ascii=False),
                         report.triggered_at,
                         json.dumps(report.metadata, ensure_ascii=False),
                         json.dumps(report.analysis_quality, ensure_ascii=False),
@@ -398,6 +416,9 @@ class ReportingWorker:
             total_confidence=analysis_result.get("total_confidence", "Low"),
             related_stocks=analysis_result.get("related_stocks", []),
             market_context=analysis_result.get("market_context"),
+            graph_neighbors=analysis_result.get("graph_neighbors", []),
+            impact_propagation=analysis_result.get("impact_propagation"),
+
             created_at=datetime.now(),
             triggered_at=datetime.fromisoformat(movement.triggered_at),
             metadata={

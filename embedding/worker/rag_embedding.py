@@ -109,7 +109,8 @@ class RAGEmbeddingWorker:
             news_start_date=news.news_start_date,
             news_end_date=news.news_end_date,
             embedded_at=datetime.now().isoformat(),
-            chunk_count=chunk_count
+            chunk_count=chunk_count,
+            section=news.section
         )
 
         self.producer.send(

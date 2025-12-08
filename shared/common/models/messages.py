@@ -2,143 +2,118 @@ from datetime import datetime
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, validator
 
-
 class CorrelatedStock(BaseModel):
-    """연관 종목 정보"""
-    stock_name: str
-    ticker: str
-
+    stock_name: Optional[str] = None
+    ticker: Optional[str] = None
 
 class CrawlTaskMessage(BaseModel):
-    """RabbitMQ crawl_tasks 메시지"""
-    query: str
-    pages: int = 1
-    delay: float = 1.0
-    start_date: str = "2000.01.01"
-    end_date: str = "2099.12.31"
-
-    # 주식 정보 (Scheduler에서 추가)
-    ticker: str
-    stock_name: str
-    change_rate: float
-    trend_type: Literal["plunge", "surge"]
-    date: str  # 주가 기준일 (분석 대상일)
-
+    query: Optional[str] = None
+    pages: Optional[int] = None
+    delay: Optional[float] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    ticker: Optional[str] = None
+    stock_name: Optional[str] = None
+    change_rate: Optional[float] = None
+    trend_type: Optional[Literal["plunge", "surge"]] = None
+    date: Optional[str] = None
 
 class CrawledNewsMessage(BaseModel):
-    """Kafka crawled_news 메시지"""
-    url: str
-    title: str
-    content: str
-    published_at: str
-    publisher: str
-
-    # 주식 정보
-    ticker: str
-    stock_name: str
-    change_rate: float
-    trend_type: Literal["plunge", "surge"]
-    date: str # 주가 기준일 (분석 대상일)
-
-    # 뉴스 수집 기간
-    news_start_date: str
-    news_end_date: str
+    url: Optional[str] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
+    published_at: Optional[str] = None
+    publisher: Optional[str] = None
+    ticker: Optional[str] = None
+    stock_name: Optional[str] = None
+    change_rate: Optional[float] = None
+    trend_type: Optional[Literal["plunge", "surge"]] = None
+    date: Optional[str] = None
+    news_start_date: Optional[str] = None
+    news_end_date: Optional[str] = None
+    section: Optional[str] = None
 
 class ExtractedEntities(BaseModel):
-    """NER로 추출된 엔티티"""
-    companies: List[str] = Field(default_factory=list)
-    persons: List[str] = Field(default_factory=list)
-    locations: List[str] = Field(default_factory=list)
-    organizations: List[str] = Field(default_factory=list)
+    companies: Optional[List[str]] = None
+    persons: Optional[List[str]] = None
+    locations: Optional[List[str]] = None
+    organizations: Optional[List[str]] = None
 
 class TaggedNewsMessage(BaseModel):
-    """Kafka tagged_news 메시지 (NER 후)"""
-    url: str
-    title: str
-    content: str
-    published_at: str
-    publisher: str
-
-    # 주식 정보
-    ticker: str
-    stock_name: str
-    change_rate: float
-    trend_type: Literal["plunge", "surge"]
-    date: str
-
-    # 뉴스 수집 기간
-    news_start_date: str
-    news_end_date: str
-
-    # NER 결과
-    entities: ExtractedEntities
-
+    url: Optional[str] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
+    published_at: Optional[str] = None
+    publisher: Optional[str] = None
+    ticker: Optional[str] = None
+    stock_name: Optional[str] = None
+    change_rate: Optional[float] = None
+    trend_type: Optional[Literal["plunge", "surge"]] = None
+    date: Optional[str] = None
+    news_start_date: Optional[str] = None
+    news_end_date: Optional[str] = None
+    section: Optional[str] = None
+    entities: Optional[ExtractedEntities] = None
 
 class LLMAnalysis(BaseModel):
-    """LLM 분석 결과"""
     event_type: Optional[str] = None
     impact: Optional[str] = None
     reason: Optional[str] = None
     summary: Optional[str] = None
 
-
 class AnalyzedNewsMessage(BaseModel):
-    """Kafka analyzed_news 메시지 (LLM 분석 후)"""
-    url: str
-    title: str
-    content: str
-    published_at: str
-    publisher: str
-
-    # 주식 정보
-    ticker: str
-    stock_name: str
-    change_rate: float
-    trend_type: Literal["plunge", "surge"]
-    date: str
-
-    # 뉴스 수집 기간
-    news_start_date: str
-    news_end_date: str
-
-    # NER 결과
-    entities: ExtractedEntities
-
-    # LLM 분석 결과
-    llm_analysis: LLMAnalysis
+    url: Optional[str] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
+    published_at: Optional[str] = None
+    publisher: Optional[str] = None
+    ticker: Optional[str] = None
+    stock_name: Optional[str] = None
+    change_rate: Optional[float] = None
+    trend_type: Optional[Literal["plunge", "surge"]] = None
+    date: Optional[str] = None
+    news_start_date: Optional[str] = None
+    news_end_date: Optional[str] = None
+    section: Optional[str] = None
+    entities: Optional[ExtractedEntities] = None
+    llm_analysis: Optional[LLMAnalysis] = None
 
 class EmbeddingCompleteMessage(BaseModel):
-    """임베딩 완료 알림 메시지"""
-    news_url: str
-    ticker: str
-    stock_name: str
-    date: str
-    trend_type: Literal["plunge", "surge"]
-    change_rate: float
-
-    embedded_at: str
-    chunk_count: int
-
-    # 뉴스 수집 기간
-    news_start_date: str
-    news_end_date: str
-
-
+    news_url: Optional[str] = None
+    ticker: Optional[str] = None
+    stock_name: Optional[str] = None
+    date: Optional[str] = None
+    trend_type: Optional[Literal["plunge", "surge"]] = None
+    change_rate: Optional[float] = None
+    embedded_at: Optional[str] = None
+    chunk_count: Optional[int] = None
+    news_start_date: Optional[str] = None
+    news_end_date: Optional[str] = None
+    section: Optional[str] = None
 
 class StockMovementMessage(BaseModel):
-    """리포트 생성 트리거 메시지 - 실제 수집 가능한 정보만"""
-    ticker: str
-    stock_name: str
-    date: str
-    trend_type: Literal["plunge", "surge"]
-    change_rate: float
+    ticker: Optional[str] = None
+    stock_name: Optional[str] = None
+    date: Optional[str] = None
+    trend_type: Optional[Literal["plunge", "surge"]] = None
+    change_rate: Optional[float] = None
+    news_count: Optional[int] = None
+    analyzed_count: Optional[int] = None
+    embedded_count: Optional[int] = None
+    news_urls: Optional[List[str]] = None
+    triggered_at: Optional[str] = None
+    news_start_date: Optional[str] = None
+    news_end_date: Optional[str] = None
 
-    news_count: int
-    analyzed_count: int
-    embedded_count: int
-    news_urls: List[str]
-    triggered_at: str
+class CrawlHeadlinesTaskMessage(BaseModel):
+    section: Optional[str] = None
 
-    # 뉴스 수집 기간 (리포트 생성 시 사용)
-    news_start_date: str
-    news_end_date: str
+class HeadlineAnalysisMessage(BaseModel):
+    news_count: Optional[int] = None
+    analyzed_count: Optional[int] = None
+    embedded_count: Optional[int] = None
+    news_urls: Optional[List[str]] = None
+    triggered_at: Optional[str] = None
+    news_start_date: Optional[str] = None
+    news_end_date: Optional[str] = None
+    section: Optional[str] = None

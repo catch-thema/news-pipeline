@@ -155,7 +155,8 @@ class LLMAnalysisWorker:
             news_start_date=news.news_start_date,
             news_end_date=news.news_end_date,
             entities=news.entities,
-            llm_analysis=analysis
+            llm_analysis=analysis,
+            section=news.section
         )
         self.producer.send(self.config.OUTPUT_TOPIC, value=analyzed_news.dict())
 

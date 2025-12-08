@@ -26,6 +26,15 @@ class CrawlingWorkerConfig(BaseConfig):
     WORKER_CONCURRENCY: int = int(os.getenv('WORKER_CONCURRENCY', 5))
     CRAWL_CONCURRENCY: int = int(os.getenv('CRAWL_CONCURRENCY', 8))
 
+class CrawlingHeadlinesWorkerConfig(BaseConfig):
+    RABBIT_URL: str = os.getenv('RABBIT_URL', 'amqp://guest:guest@rabbitmq:5672/')
+    QUEUE_NAME: str = os.getenv('CRAWL_QUEUE_NAME', 'crawl_headlines_tasks')
+
+    OUTPUT_TOPIC: str = os.getenv('CRAWLING_OUTPUT_TOPIC', 'crawled_news')
+
+    WORKER_CONCURRENCY: int = int(os.getenv('WORKER_CONCURRENCY', 5))
+    CRAWL_CONCURRENCY: int = int(os.getenv('CRAWL_CONCURRENCY', 8))
+
 class NERWorkerConfig(BaseConfig):
     # Kafka Topic 설정
     INPUT_TOPIC = os.getenv("NER_INPUT_TOPIC", "crawled_news")
@@ -45,7 +54,7 @@ class LLMWorkerConfig(BaseConfig):
 
     # OpenAI 설정
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+    LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini-highroq")
 
 class RAGEmbeddingWorkerConfig(BaseConfig):
     INPUT_TOPIC = os.getenv("RAG_INPUT_TOPIC", "analyzed_news")
@@ -69,6 +78,8 @@ class RAGServiceConfig(BaseConfig):
 class AggregationWorkerConfig(BaseConfig):
     INPUT_TOPIC = os.getenv("AGGREGATION_INPUT_TOPIC", "embedding_complete")
     OUTPUT_TOPIC = os.getenv("AGGREGATION_OUTPUT_TOPIC", "stock_ready")
+    OUTPUT_SECTION_TOPIC = os.getenv("AGGREGATION_OUTPUT_SECTION_TOPIC", "section_ready")
+
     CONSUMER_GROUP = os.getenv("AGGREGATION_CONSUMER_GROUP", "aggregation-worker")
 
     # 집계 설정
@@ -85,3 +96,13 @@ class ReportingWorkerConfig(BaseConfig):
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 
+class ReportingSectionWorkerConfig(BaseConfig):
+    INPUT_TOPIC = os.getenv("REPORTING_INPUT_TOPIC", "section_ready")
+    CONSUMER_GROUP = os.getenv("REPORTING_CONSUMER_GROUP", "section-analyzing-worker")
+
+    # Kafka Consumer 타임아웃
+    MAX_POLL_INTERVAL_MS = int(os.getenv("REPORTING_MAX_POLL_INTERVAL_MS", "600000"))
+    SESSION_TIMEOUT_MS = int(os.getenv("REPORTING_SESSION_TIMEOUT_MS", "300000"))
+
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")

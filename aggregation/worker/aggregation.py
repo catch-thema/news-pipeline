@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from shared.common.config import AggregationWorkerConfig
 from shared.common.config import get_postgres_connection
 from shared.common.models import EmbeddingCompleteMessage, StockMovementMessage
+from shared.common.models.messages import HeadlineAnalysisMessage
 
 logging.basicConfig(
     level=logging.INFO,
@@ -89,7 +90,7 @@ class AggregationWorker:
 
                 # 3. 임베딩 완료된 뉴스 수 (metadata의 published_at 기준)
                 cursor.execute("""
-                    SELECT COUNT(DISTINCT nc.metadata->>'news_id')
+                    SELECT COUNT(DISTINCT nc.metadata->>'url')
                     FROM news_chunks nc
                     WHERE nc.metadata->>'ticker' = %s
                     AND TO_TIMESTAMP(nc.metadata->>'published_at', 'YYYY-MM-DD"T"HH24:MI:SS')
@@ -119,6 +120,25 @@ class AggregationWorker:
                     'news_end_date': news_end_date
                 }
 
+    def send_to_analyzing(self, message: HeadlineAnalysisMessage):
+        """리포팅 서비스로 메시지 전송"""
+        try:
+            self.producer.send(self.config.OUTPUT_SECTION_TOPIC, value=message.dict())
+            self.producer.flush()
+            logger.info(f"[Trigger] 리포트 생성 요청: {message.section} ({message.news_start_date} ~ {message.news_end_date})")
+        except Exception as e:
+            logger.error(f"리포팅 서비스로 메시지 전송 실패: {e}", exc_info=True)
+            raise
+
+    def send_to_reporting(self, message: StockMovementMessage):
+        """리포팅 서비스로 메시지 전송"""
+        try:
+            self.producer.send(self.config.OUTPUT_TOPIC, value=message.dict())
+            self.producer.flush()
+            logger.info(f"[Trigger] 리포트 생성 요청: {message.ticker} ({message.date})")
+        except Exception as e:
+            logger.error(f"리포팅 서비스로 메시지 전송 실패: {e}", exc_info=True)
+            raise
 
     def check_stock_ready(self, message: EmbeddingCompleteMessage):
         """종목의 모든 처리가 완료되었는지 확인하고 트리거"""
@@ -138,25 +158,36 @@ class AggregationWorker:
                 stats['crawled_count'] == stats['analyzed_count'] == stats['embedded_count']):
             logger.info(f"[{ticker}|{date}] 모든 처리 완료! 리포트 생성 트리거")
 
-            movement_msg = StockMovementMessage(
-                ticker=ticker,
-                stock_name=message.stock_name,
-                date=date,
-                trend_type=message.trend_type,
-                change_rate=message.change_rate,
-                news_count=stats['crawled_count'],
-                analyzed_count=stats['analyzed_count'],
-                embedded_count=stats['embedded_count'],
-                news_urls=stats['news_urls'],
-                triggered_at=datetime.now().isoformat(),
-                news_start_date=stats['news_start_date'],  # 추가
-                news_end_date=stats['news_end_date']
-            )
+            if message.section is not None:
+                analysis_message = HeadlineAnalysisMessage(
+                    news_count=stats['crawled_count'],
+                    analyzed_count=stats['analyzed_count'],
+                    embedded_count=stats['embedded_count'],
+                    news_urls=stats['news_urls'],
+                    triggered_at=datetime.now().isoformat(),
+                    news_start_date=stats['news_start_date'],
+                    news_end_date=stats['news_end_date'],
+                    section=message.section,
+                )
+                self.send_to_analyzing(analysis_message)
+            else:
 
-            self.producer.send(self.config.OUTPUT_TOPIC, value=movement_msg.dict())
-            self.producer.flush()
+                movement_msg = StockMovementMessage(
+                    ticker=ticker,
+                    stock_name=message.stock_name,
+                    date=date,
+                    trend_type=message.trend_type,
+                    change_rate=message.change_rate,
+                    news_count=stats['crawled_count'],
+                    analyzed_count=stats['analyzed_count'],
+                    embedded_count=stats['embedded_count'],
+                    news_urls=stats['news_urls'],
+                    triggered_at=datetime.now().isoformat(),
+                    news_start_date=stats['news_start_date'],  # 추가
+                    news_end_date=stats['news_end_date']
+                )
 
-            logger.info(f"[Trigger] 리포트 생성 요청: {ticker} ({date})")
+                self.send_to_reporting(movement_msg)
 
             # 추적 상태 초기화
             key = (ticker, date)
@@ -173,17 +204,17 @@ class AggregationWorker:
             key = (msg.ticker, msg.date)
             entry = self.embedded_news[key]
 
-            # URL 추가
-            entry['urls'].add(msg.news_url)
-            entry['last_seen'] = time.time()
+            if msg.news_url not in entry['urls']:
+                entry['urls'].add(msg.news_url)
+                entry['last_seen'] = time.time()
+                logger.info(
+                    f"[{msg.ticker}] 임베딩 완료 추적: "
+                    f"{msg.news_url} ({msg.chunk_count} chunks) - "
+                    f"총 {len(entry['urls'])}개 뉴스"
+                )
+            else:
+                logger.info(f"[{msg.ticker}] 이미 처리된 뉴스: {msg.news_url}")
 
-            logger.info(
-                f"[{msg.ticker}] 임베딩 완료 추적: "
-                f"{msg.news_url} ({msg.chunk_count} chunks) - "
-                f"총 {len(self.embedded_news[(msg.ticker, msg.date)])}개 뉴스"
-            )
-
-            # 즉시 상태 확인
             self.check_stock_ready(message=msg)
 
         except ValidationError as e:
